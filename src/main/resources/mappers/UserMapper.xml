@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.User">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="qq_num" jdbcType="VARCHAR" property="qqNum" />
+    <result column="phone_num" jdbcType="VARCHAR" property="phoneNum" />
+    <result column="emp_num" jdbcType="VARCHAR" property="empNum" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="role" jdbcType="INTEGER" property="role" />
+    <result column="created_by" jdbcType="BIGINT" property="createdBy" />
+    <result column="updated_by" jdbcType="BIGINT" property="updatedBy" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.User" useGeneratedKeys="true">
+    insert into user (id, `name`, qq_num, 
+      phone_num, emp_num, `password`, 
+      `role`, created_by, updated_by
+      )
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{qqNum,jdbcType=VARCHAR}, 
+      #{phoneNum,jdbcType=VARCHAR}, #{empNum,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+      #{role,jdbcType=INTEGER}, #{createdBy,jdbcType=BIGINT}, #{updatedBy,jdbcType=BIGINT}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.User">
+    update user
+    set `name` = #{name,jdbcType=VARCHAR},
+      qq_num = #{qqNum,jdbcType=VARCHAR},
+      phone_num = #{phoneNum,jdbcType=VARCHAR},
+      emp_num = #{empNum,jdbcType=VARCHAR},
+      `password` = #{password,jdbcType=VARCHAR},
+      `role` = #{role,jdbcType=INTEGER},
+      created_by = #{createdBy,jdbcType=BIGINT},
+      updated_by = #{updatedBy,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, `name`, qq_num, phone_num, emp_num, `password`, `role`, created_by, updated_by
+    from user
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, `name`, qq_num, phone_num, emp_num, `password`, `role`, created_by, updated_by
+    from user
+  </select>
+  <select id="selectByEmpNum" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from user where emp_num=#{empNum}
+  </select>
+  <select id="selectByRole" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select * from user where role=#{role}
+  </select>
+  <select id="selectByRandom" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from user where name like '%${info}%' or qq_num like '%${info}%'
+    or phone_num like '%${info}%' or emp_num like '%${info}%'
+  </select>
+  <select id="selectUserByProjectId" resultMap="BaseResultMap">
+    select user.id,user.name,user.qq_num,user.phone_num,user.emp_num,user.password
+    ,user.role,user.created_by,user.updated_by from user inner join
+    user_project on user.id=user_project.user_id where user_project.project_id=#{projectId}
+  </select>
+</mapper>

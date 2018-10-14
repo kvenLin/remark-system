@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.UserProjectMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.UserProject">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="project_id" jdbcType="BIGINT" property="projectId" />
+  </resultMap>
+  <resultMap id="ProjectResultMap" type="com.uchain.remarksystem.model.Project">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="has_text" jdbcType="INTEGER" property="hasText" />
+    <result column="words_num" jdbcType="INTEGER" property="wordsNum" />
+    <result column="data_num" jdbcType="INTEGER" property="dataNum" />
+    <result column="package_num" jdbcType="INTEGER" property="packageNum" />
+    <result column="check_num" jdbcType="INTEGER" property="checkNum" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="created_by" jdbcType="BIGINT" property="createdBy" />
+    <result column="updated_by" jdbcType="BIGINT" property="updatedBy" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from user_project
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <delete id="deleteByProject">
+      delete from user_project where project_id=#{id}
+    </delete>
+    <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.UserProject" useGeneratedKeys="true">
+    insert into user_project (id, user_id, project_id
+      )
+    values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{projectId,jdbcType=BIGINT}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.UserProject">
+    update user_project
+    set user_id = #{userId,jdbcType=BIGINT},
+      project_id = #{projectId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, user_id, project_id
+    from user_project
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, user_id, project_id
+    from user_project
+  </select>
+    <select id="selectByUserIdAndProjectId" resultMap="BaseResultMap">
+      select * from user_project where user_id=#{param1} and project_id=#{param2}
+    </select>
+    <select id="selectProjectByUserId" resultMap="ProjectResultMap">
+      select project.id,project.name,project.has_text,project.data_num
+      ,project.package_num,project.check_num,project.status,project.created_by
+      ,project.updated_by from project inner join user_project
+      on project.id=user_project.project_id where user_project.user_id=#{userId}
+    </select>
+
+</mapper>

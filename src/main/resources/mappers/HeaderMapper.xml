@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.HeaderMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.Header">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="column_num" jdbcType="INTEGER" property="columnNum" />
+    <result column="project_id" jdbcType="BIGINT" property="projectId" />
+    <result column="created_by" jdbcType="BIGINT" property="createdBy" />
+    <result column="updated_by" jdbcType="BIGINT" property="updatedBy" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from header
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <delete id="deleteHeaderByProject">
+      delete from header where project_id=#{projectId}
+    </delete>
+    <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.Header" useGeneratedKeys="true">
+    insert into header (id, `name`, column_num, 
+      project_id, created_by, updated_by
+      )
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{columnNum,jdbcType=INTEGER}, 
+      #{projectId,jdbcType=BIGINT}, #{createdBy,jdbcType=BIGINT}, #{updatedBy,jdbcType=BIGINT}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.Header">
+    update header
+    set `name` = #{name,jdbcType=VARCHAR},
+      column_num = #{columnNum,jdbcType=INTEGER},
+      project_id = #{projectId,jdbcType=BIGINT},
+      created_by = #{createdBy,jdbcType=BIGINT},
+      updated_by = #{updatedBy,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, `name`, column_num, project_id, created_by, updated_by
+    from header
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, `name`, column_num, project_id, created_by, updated_by
+    from header
+  </select>
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+      select * from header where project_id=#{projectId} order by column_num asc
+    </select>
+  <select id="selectByProjectIdColumnNum" resultMap="BaseResultMap">
+    select * from header where project_id=#{param1} and column_num=#{param2}
+  </select>
+  <select id="selectLaterHeader" resultMap="BaseResultMap">
+    select * from header where project_id=#{param1} and column_num>#{param2}
+  </select>
+</mapper>

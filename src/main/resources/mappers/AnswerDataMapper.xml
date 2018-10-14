@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.AnswerDataMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.AnswerData">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="row_num" jdbcType="INTEGER" property="rowNum" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="package_id" jdbcType="BIGINT" property="packageId" />
+    <result column="answer_header_id" jdbcType="BIGINT" property="answerHeaderId" />
+    <result column="project_id" jdbcType="BIGINT" property="projectId" />
+  </resultMap>
+  <resultMap id="BaseVO" type="com.uchain.remarksystem.VO.RowStatusVO">
+    <result column="row_num" jdbcType="INTEGER" property="rowNum" />
+    <result column="status" jdbcType="INTEGER" property="status"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from answer_data
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <delete id="deleteByProject" parameterType="java.lang.Long">
+      delete from answer_data
+      where id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.AnswerData" useGeneratedKeys="true">
+    insert into answer_data (id,row_num, content, package_id,
+      answer_header_id, project_id)
+    values (#{id,jdbcType=BIGINT}, #{rowNum,jdbcType=INTEGER},#{content,jdbcType=VARCHAR}
+    , #{packageId,jdbcType=BIGINT},
+      #{answerHeaderId,jdbcType=BIGINT}
+      , #{projectId,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.AnswerData">
+    update answer_data
+    set
+    row_num =  #{rowNum,jdbcType=INTEGER},
+    content = #{content,jdbcType=VARCHAR},
+      package_id = #{packageId,jdbcType=BIGINT},
+      answer_header_id = #{answerHeaderId,jdbcType=BIGINT},
+      project_id = #{projectId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id,row_num, content, package_id, answer_header_id, project_id
+    from answer_data
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, row_num,content, package_id, answer_header_id, project_id
+    from answer_data
+  </select>
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        select * from answer_data where project_id=#{projectId}
+    </select>
+    <select id="selectByPackageId" resultMap="BaseResultMap">
+        select * from answer_data where package_id=#{packageId} order by row_num,answer_header_id asc
+    </select>
+    <select id="selectByPackageAndRowNum" resultMap="BaseResultMap">
+      select * from answer_data where package_id=#{param1} and row_num=#{param2}
+    </select>
+    <select id="selectByProjectAndRowNum" resultMap="BaseResultMap">
+      select * from answer_data where project_id=#{param1} and row_num=#{param2} order by answer_header_id asc
+    </select>
+  <select id="selectByAnswerHeaderIdAndRowNum" resultMap="BaseResultMap">
+    select * from answer_data where answer_header_id=#{param1} and row_num=#{param2}
+  </select>
+</mapper>

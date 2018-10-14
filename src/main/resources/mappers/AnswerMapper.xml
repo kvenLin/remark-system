@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.AnswerMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.Answer">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="package_id" jdbcType="BIGINT" property="packageId" />
+    <result column="row_num" jdbcType="INTEGER" property="rowNum" />
+    <result column="choice_id" jdbcType="BIGINT" property="choiceId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from answer
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByProject" parameterType="java.lang.Long">
+    delete answer from answer,package
+    where answer.package_id=package.id
+    and package.project_id=#{id}
+  </delete>
+  <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.Answer" useGeneratedKeys="true">
+    insert into answer (id, package_id, choice_id,
+      user_id,  `status`,row_num
+      )
+    values (#{id,jdbcType=BIGINT}, #{packageId,jdbcType=BIGINT},#{choiceId,jdbcType=BIGINT},
+      #{userId,jdbcType=BIGINT}, #{status,jdbcType=INTEGER},#{rowNum,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.Answer">
+    update answer
+    set choice_id = #{choiceId,jdbcType=BIGINT},
+      package_id = #{packageId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      `status` = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, package_id, row_num,choice_id, user_id,  `status`
+    from answer
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, package_id,row_num, choice_id, user_id,  `status`
+    from answer
+  </select>
+    <select id="selectByPackageAndRowNum" resultMap="BaseResultMap">
+      select * from answer where package_id=#{param1} and row_num=#{param2}
+    </select>
+    <select id="selectByProjectAndRowNum" resultMap="BaseResultMap">
+      select answer.id,answer.package_id,answer.row_num,answer.choice_id,answer.user_id
+      ,answer.status from answer
+      left join package on answer.package_id=package.id
+      left join project on project.id=package.project_id
+      where project.id=#{param1} and answer.row_num=#{param2}
+    </select>
+</mapper>

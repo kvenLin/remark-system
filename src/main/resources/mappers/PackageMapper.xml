@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.PackageMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.Package">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="project_id" jdbcType="BIGINT" property="projectId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap id="VOResultMap" type="com.uchain.remarksystem.VO.PackageInfoVO">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="projectName" />
+    <result column="username" jdbcType="BIGINT" property="username" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap id="VOBaseUserMap" type="com.uchain.remarksystem.VO.UserPackageVO">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="project_id" jdbcType="BIGINT" property="projectId"/>
+    <result column="name" jdbcType="VARCHAR" property="projectName" />
+    <result column="username" jdbcType="BIGINT" property="username" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from package
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByProject" parameterType="java.lang.Long">
+    delete from package where project_id=#{id}
+  </delete>
+  <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.Package" useGeneratedKeys="true">
+    insert into package (id, project_id, user_id, 
+      `status`, start_time, update_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{projectId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, 
+      #{status,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.Package">
+    update package
+    set project_id = #{projectId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      `status` = #{status,jdbcType=INTEGER},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, project_id, user_id, `status`, start_time, update_time
+    from package
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, project_id, user_id, `status`, start_time, update_time
+    from package
+  </select>
+    <select id="selectByUserIdAndProjectId" resultMap="BaseResultMap">
+      select * from package where user_id=#{param1} and project_id=#{param2}
+      and (status=1 or status=2 or status=3 or status=4)
+    </select>
+  <select id="selectByProjectId" resultMap="BaseResultMap">
+    select * from package where project_id=#{projectId}
+  </select>
+    <select id="selectByUserId" resultMap="VOBaseUserMap">
+      select package.id,package.project_id, project.name, user.name as username, package.status
+      , package.start_time, package.update_time from package
+      left join project on package.project_id=project.id
+      left join user on user.id=package.user_id
+       where user_id=#{id}
+    </select>
+    <select id="selectByStatusAndProject" resultMap="BaseResultMap">
+      select * from package where status=#{param1} and project_id=#{param2}
+    </select>
+  <select id="selectPackageVOByProjectId" resultMap="VOResultMap">
+    select package.id, project.name, user.name as username, package.status, package.start_time, package.update_time
+    from package left join project on package.project_id=project.id left join user on user.id=package.user_id
+    <where>
+      <if test="info!=null">
+        and package.project_id like '%${info}%' or project.name like '%${info}%' or user.name like '%${info}%'
+      </if>
+    </where>
+  </select>
+  <select id="selectUnFinishPackage" resultMap="BaseResultMap">
+    select * from package where status!=5 and project_id=#{param2} and user_id=#{param1}
+  </select>
+    <select id="selectByAnswerId" resultMap="BaseResultMap">
+      select package.id,package.project_id, package.user_id, package.status, package.start_time, package.update_time
+      from package inner join answer on answer.package_id=package.id where answer.id=#{answerId}
+    </select>
+  <select id="selectByUserJoin" resultMap="VOBaseUserMap">
+    select package.id,package.project_id, project.name, user.name as username, package.status
+      , package.start_time, package.update_time from package
+      left join user_project on user_project.project_id=package.project_id
+      left join project on package.project_id=project.id
+      left join user on user.id=package.user_id
+      where user_project.user_id=#{userId}
+  </select>
+</mapper>

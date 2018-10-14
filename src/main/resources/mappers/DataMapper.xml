@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.DataMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.Data">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="row_num" jdbcType="INTEGER" property="rowNum" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="answer_id" jdbcType="BIGINT" property="answerId" />
+    <result column="package_id" jdbcType="BIGINT" property="packageId" />
+    <result column="header_id" jdbcType="BIGINT" property="headerId" />
+    <result column="project_id" jdbcType="BIGINT" property="projectId" />
+  </resultMap>
+  <resultMap id="BaseVO" type="com.uchain.remarksystem.VO.RowStatusVO">
+    <result column="row_num" jdbcType="INTEGER" property="rowNum" />
+    <result column="status" jdbcType="INTEGER" property="status"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from data
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <delete id="deleteByProject" parameterType="java.lang.Long">
+      delete from data
+      where project_id=#{id}
+    </delete>
+    <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.Data" useGeneratedKeys="true">
+    insert into data (id,row_num, content,answer_id, package_id,
+      header_id, project_id)
+    values (#{id,jdbcType=BIGINT}, #{rowNum,jdbcType=INTEGER},#{content,jdbcType=VARCHAR}
+    ,#{answerId,jdbcType=INTEGER}, #{packageId,jdbcType=BIGINT},
+      #{headerId,jdbcType=BIGINT}, #{projectId,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.Data">
+    update data
+    set
+    row_num =  #{rowNum,jdbcType=INTEGER},
+    content = #{content,jdbcType=VARCHAR},
+    answer_id = #{answerId,jdbcType=INTEGER},
+      package_id = #{packageId,jdbcType=BIGINT},
+      header_id = #{headerId,jdbcType=BIGINT},
+      project_id = #{projectId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+    <update id="grabProjectDataRandom">
+      update data inner join (
+      select * from data where project_id=#{param1}
+      and package_id is null and row_num  in (
+      select s.row_num from (
+      select  distinct row_num from data where project_id=#{param1}
+      and package_id is null order by rand() limit #{param3} )
+      as s)) as t on data.id=t.id set data.package_id=#{param2}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id,row_num, content,answer_id, package_id, header_id, project_id
+    from data
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, row_num,content, answer_id,package_id, header_id, project_id
+    from data
+  </select>
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        select * from data where project_id=#{projectId}
+    </select>
+    <select id="selectByPackageId" resultMap="BaseResultMap">
+        select * from data where package_id=#{packageId} order by row_num,header_id asc
+    </select>
+  <select id="selectPackageNoAnswerData" resultMap="BaseResultMap">
+    select id,row_num, content,answer_id, package_id, header_id, project_id
+    from data where package_id=#{packageId} and answer_id is null
+  </select>
+    <select id="selectByPackageAndRowNum" resultMap="BaseResultMap">
+      select * from data where package_id=#{param1} and row_num=#{param2}
+    </select>
+    <select id="selectRowStatus" resultMap="BaseVO">
+      select t.row_num,answer.status from (
+      select data.row_num,data.package_id from data where package_id=#{param1}
+      group by row_num
+      <choose>
+        <when test="param2!=null">
+        order by  rand() limit #{param2}
+        </when>
+        <otherwise>
+        order by row_num asc
+        </otherwise>
+      </choose>
+      ) as t left join answer
+      on t.row_num=answer.row_num and t.package_id=answer.package_id
+      where t.package_id=#{param1}
+      order by row_num
+    </select>
+  <select id="selectProjectNoAnswerData" resultMap="BaseResultMap">
+    select id,row_num, content,answer_id, package_id, header_id, project_id
+    from data where project_id=#{projectId} and answer_id is null
+  </select>
+    <select id="selectByProjectAndRowNum" resultMap="BaseResultMap">
+      select * from data where project_id=#{param1} and row_num=#{param2} order by id asc
+    </select>
+  <select id="selectPackageAnswerData" resultMap="BaseResultMap">
+    select id,row_num, content,answer_id, package_id, header_id, project_id
+    from data where project_id=#{packageId} and answer_id is not null
+  </select>
+
+</mapper>

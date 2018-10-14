@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uchain.remarksystem.dao.ProjectMapper">
+  <resultMap id="BaseResultMap" type="com.uchain.remarksystem.model.Project">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="has_text" jdbcType="INTEGER" property="hasText" />
+    <result column="words_num" jdbcType="INTEGER" property="wordsNum" />
+    <result column="data_num" jdbcType="INTEGER" property="dataNum" />
+    <result column="package_num" jdbcType="INTEGER" property="packageNum" />
+    <result column="check_num" jdbcType="INTEGER" property="checkNum" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="created_by" jdbcType="BIGINT" property="createdBy" />
+    <result column="updated_by" jdbcType="BIGINT" property="updatedBy" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from project
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.uchain.remarksystem.model.Project">
+    insert into project (id, `name`, has_text, 
+      words_num, data_num, package_num, 
+      check_num, `status`, created_by, 
+      updated_by)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{hasText,jdbcType=INTEGER}, 
+      #{wordsNum,jdbcType=INTEGER}, #{dataNum,jdbcType=INTEGER}, #{packageNum,jdbcType=INTEGER}, 
+      #{checkNum,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createdBy,jdbcType=BIGINT}, 
+      #{updatedBy,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.uchain.remarksystem.model.Project">
+    update project
+    set `name` = #{name,jdbcType=VARCHAR},
+      has_text = #{hasText,jdbcType=INTEGER},
+      words_num = #{wordsNum,jdbcType=INTEGER},
+      data_num = #{dataNum,jdbcType=INTEGER},
+      package_num = #{packageNum,jdbcType=INTEGER},
+      check_num = #{checkNum,jdbcType=INTEGER},
+      `status` = #{status,jdbcType=INTEGER},
+      created_by = #{createdBy,jdbcType=BIGINT},
+      updated_by = #{updatedBy,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, `name`, has_text, words_num, data_num, package_num, check_num, `status`, 
+    created_by, updated_by
+    from project
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, `name`, has_text, words_num, data_num, package_num, check_num, `status`, 
+    created_by, updated_by
+    from project
+  </select>
+    <select id="selectByRandom" resultMap="BaseResultMap">
+      select * from project where id like '%${info}%' or name like '%${info}%'
+    </select>
+    <select id="selectByHeaderId" resultMap="BaseResultMap">
+      select project.id, project.name, project.has_text,project.words_num,project.data_num, project.package_num
+      , project.check_num, project.status , project.created_by, project.updated_by
+      from project inner join header on project.id=header.project_id where header.id=#{headerId}
+    </select>
+  <select id="selectByChoiceId" resultMap="BaseResultMap">
+    select project.id, project.name, project.has_text,project.words_num,project.data_num, project.package_num
+    , project.check_num, project.status , project.created_by, project.updated_by
+    from project inner join choice on project.id=choice.project_id where choice.id=#{choiceId}
+  </select>
+    <select id="selectByPackageId" resultMap="BaseResultMap">
+      select project.id, project.name, project.has_text,project.words_num,project.data_num, project.package_num
+      , project.check_num, project.status , project.created_by, project.updated_by
+      from project inner join package on project.id=package.project_id where package.id=#{packageId}
+    </select>
+    <select id="selectByAnswerHeaderId" resultMap="BaseResultMap">
+      select project.id, project.name, project.has_text,project.words_num,project.data_num, project.package_num
+      , project.check_num, project.status , project.created_by, project.updated_by
+      from project inner join answer_header on project.id=answer_header.project_id where answer_header.id=#{answerHeaderId}
+    </select>
+</mapper>
