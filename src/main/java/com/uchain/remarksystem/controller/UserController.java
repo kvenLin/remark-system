@@ -100,7 +100,7 @@ public class UserController {
     @GetMapping("/selectByEmpNum")
     @RequireRole(role = RoleEnum.ADMIN)
     public Object selectByEmpNum(String emp_num){
-        //TODO,改成随机搜索是否需要分页,如果需要随机搜索前端处理
+        //改成随机搜索是否需要分页,如果需要随机搜索前端处理
         User user = userService.selectByEmpNum(emp_num);
         if (user==null){
             return Result.error(CodeMsg.USER_NOT_EXIST);

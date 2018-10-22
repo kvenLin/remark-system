@@ -25,7 +25,10 @@
     <delete id="deleteByProject">
       delete from user_project where project_id=#{id}
     </delete>
-    <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.UserProject" useGeneratedKeys="true">
+  <delete id="deleteByUserId">
+    delete from user_project where user_id=#{userId}
+  </delete>
+  <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.UserProject" useGeneratedKeys="true">
     insert into user_project (id, user_id, project_id
       )
     values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{projectId,jdbcType=BIGINT}
@@ -55,5 +58,12 @@
       ,project.updated_by from project inner join user_project
       on project.id=user_project.project_id where user_project.user_id=#{userId}
     </select>
+  <select id="selectUnfinishedProjectByUserId" resultMap="ProjectResultMap">
+    select project.id,project.name,project.has_text,project.data_num
+      ,project.package_num,project.check_num,project.status,project.created_by
+      ,project.updated_by from project inner join user_project
+      on project.id=user_project.project_id where user_project.user_id=#{userId}
+      and project.status=1
+  </select>
 
 </mapper>

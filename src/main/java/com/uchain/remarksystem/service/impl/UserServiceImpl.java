@@ -4,11 +4,13 @@ import com.uchain.remarksystem.DTO.VerifyCode;
 import com.uchain.remarksystem.dao.UserMapper;
 import com.uchain.remarksystem.enums.CodeMsg;
 import com.uchain.remarksystem.form.user.*;
+import com.uchain.remarksystem.model.Project;
 import com.uchain.remarksystem.model.User;
 import com.uchain.remarksystem.redis.RedisService;
 import com.uchain.remarksystem.redis.VerifyCodeKey;
 import com.uchain.remarksystem.result.Result;
 import com.uchain.remarksystem.security.JwtTokenUtil;
+import com.uchain.remarksystem.service.UserProjectService;
 import com.uchain.remarksystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +49,8 @@ public class UserServiceImpl implements UserService {
     private UserDetailsService userDetailsService;
     @Value("${jwt.secret}")
     private String secret;
+    @Autowired
+    private UserProjectService userProjectService;
 
     @Override
     public boolean insert(User user) {
@@ -108,10 +112,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result deleteUser(Long userId) {
-        //TODO,删除前需要判断当前用户是否可以进行删除
-        // 若参加了还未完成的项目则不能删除,
+        //删除前需要判断当前用户是否可以进行删除
+        // 若参加了还未完成的项目则不能删除
+        List<Project> projects = userProjectService.selectUnfinishedProjectByUserId(userId);
+        if (projects.size()!=0){
+            return Result.error(CodeMsg.PROJECT_UN_FINISH_CAN_NOT_DELETE_USER);
+        }
         // 若未参加或者参加的项目已经结束则可以删除
         delete(userId);
+        userProjectService.deleteByUser(userId);
         return Result.success();
     }
 

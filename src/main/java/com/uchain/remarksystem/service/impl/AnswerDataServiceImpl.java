@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,6 +48,9 @@ public class AnswerDataServiceImpl implements AnswerDataService {
 
     @Override
     public boolean update(AnswerData answerData) {
+        if (StringUtils.isEmpty(answerData.getContent())){
+            answerData.setContent("");
+        }
         if (answerDataMapper.updateByPrimaryKey(answerData)==1) {
             return true;
         }
@@ -95,6 +99,8 @@ public class AnswerDataServiceImpl implements AnswerDataService {
             return Result.error(CodeMsg.ANSWER_ALREADY_EXIST);
         }
         AnswerData answerData = new AnswerData();
+        //返回添加后的结果
+        List<AnswerData> answerDataResult = new ArrayList<>();
         BeanUtils.copyProperties(answerDataDTO,answerData);
         for (AnswerDataForm answerDataForm : answerDataDTO.getAnswerDataForms()) {
             Header header = formService.selectByAnswerHeaderId(answerDataForm.getAnswerHeaderId());
@@ -117,6 +123,10 @@ public class AnswerDataServiceImpl implements AnswerDataService {
             if (!insert(answerData)) {
                 throw new GlobalException(CodeMsg.ADD_ERROR);
             }
+            log.info("answerData:{}",answerData);
+            AnswerData answerData2 = new AnswerData();
+            BeanUtils.copyProperties(answerData,answerData2);
+            answerDataResult.add(answerData2);
         }
         //添加数据的回答状态
         Answer answer = new Answer();
@@ -134,7 +144,7 @@ public class AnswerDataServiceImpl implements AnswerDataService {
                 throw new GlobalException(CodeMsg.UPDATE_ERROR);
             }
         }
-        return Result.success();
+        return Result.success(answerDataResult);
     }
 
     @Transactional
@@ -153,7 +163,7 @@ public class AnswerDataServiceImpl implements AnswerDataService {
             }
             temp = answerData;
         }
-        //TODO,更新数据后更改回答的状态
+        //更新数据后更改回答的状态
         Answer answer = answerService.selectByPackageAndRowNum(temp.getPackageId(), temp.getRowNum());
         //如果是标注员则将更新操作后的回答状态改成0:未审核
         if (userService.getCurrentUser().getRole()==1){

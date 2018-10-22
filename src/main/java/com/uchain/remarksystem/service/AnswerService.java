@@ -6,6 +6,8 @@ import com.uchain.remarksystem.form.answer.AnswerUpdateForm;
 import com.uchain.remarksystem.model.Answer;
 import com.uchain.remarksystem.result.Result;
 
+import java.util.List;
+
 public interface AnswerService {
     boolean insert(Answer answer);
     boolean update(Answer answer);
@@ -14,4 +16,5 @@ public interface AnswerService {
     Answer selectByProjectAndRowNum(Long projectId, Integer rowNum);
     Result updateAnswer(AnswerUpdateForm answerUpdateForm);
     Result changeAnswerStatus(AnswerStatusForm answerStatusForm);
+    List<Answer> selectByPackageAndStatus(Long packageId, Integer status);
 }

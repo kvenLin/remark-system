@@ -54,13 +54,16 @@ public class DataController {
         //0:未完成,1:审核状态,2:验收状态,3:审核打回,4:验收打回,5:通过状态
         Integer role = currentUser.getRole();
         Integer status = aPackage.getStatus();
-        if (role==1&&(status==1||status==2||status==4||status==5)){
+        //验收员可以查看0,3,4
+        if (role==1&&(status==1||status==2||status==5)){
             return Result.error(CodeMsg.STATUS_OVER_ROLE);
         }
-        if (role==2&&(status==0||status==2||status==3||status==5)){
+        //质检员可以查看1
+        if (role==2&&(status==0||status==2||status==3||status==4||status==5)){
             return Result.error(CodeMsg.STATUS_OVER_ROLE);
         }
-        if (role==3&&(status==1||status==3||status==5)){
+        //验收员可以查看2
+        if (role==3&&(status==1||status==3||status==4||status==5)){
             return Result.error(CodeMsg.STATUS_OVER_ROLE);
         }
         return dataService.showOneDataResultVO(packageId,rowNum);
@@ -89,13 +92,16 @@ public class DataController {
         //0:未完成,1:审核状态,2:验收状态,3:审核打回,4:验收打回,5:通过状态
         Integer role = currentUser.getRole();
         Integer status = aPackage.getStatus();
-        if (role==1&&(status==1||status==2||status==4||status==5)){
+        //验收员可以查看0,3,4
+        if (role==1&&(status==1||status==2||status==5)){
             return Result.error(CodeMsg.STATUS_OVER_ROLE);
         }
-        if (role==2&&(status==0||status==2||status==3||status==5)){
+        //质检员可以查看1
+        if (role==2&&(status==0||status==2||status==3||status==4||status==5)){
             return Result.error(CodeMsg.STATUS_OVER_ROLE);
         }
-        if (role==3&&(status==1||status==3||status==5)){
+        //验收员可以查看2
+        if (role==3&&(status==1||status==3||status==4||status==5)){
             return Result.error(CodeMsg.STATUS_OVER_ROLE);
         }
 

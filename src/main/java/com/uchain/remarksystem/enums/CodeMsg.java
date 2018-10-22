@@ -53,7 +53,7 @@ public enum CodeMsg {
     PROJECT_NOT_START(538,"项目未启动,无法执行导出操作" ),
     ANSWER_NO_EXIST(539,"回答不存在,不能进行更新操作"),
     ANSWER_ALREADY_EXIST(540,"答案已经提交过,请修改内容后再次提交"),
-    PACKAGE_COMMIT_TO_CHECK(541,"已提交至审核状态,无法进行编辑"),
+    PACKAGE_COMMIT_TO_CHECK(541,"非标注状态,无法进行编辑"),
     STATUS_OVER_ROLE(542,"无法查看当前状态的数据包"),
     NOT_BID_USER(543,"不是标注员身份无法操作" ),
     DOWNLOAD_FILE_ERROR(544, "文件下载异常"),
@@ -66,7 +66,9 @@ public enum CodeMsg {
     ADD_ADMIN_UNCHECK_ERROR(551,"项目不能添加管理员或未审核用户" ),
     CONTENT_CAN_NOT_NULL(552,"回答的内容不能为空" ),
     RELEASE_PACKAGE_STATUS_ERROR(553,"只能释放未完成的数据包状态" ),
-    PROJECT_CAN_NOT_DELETE(554,"只有未启动或已完成的项目才能进行删除" );
+    PROJECT_CAN_NOT_DELETE(554,"只有未启动或已完成的项目才能进行删除" ),
+    HAS_WRONG_ANSWER_TO_CHANGE(555,"有错误答案需有修改" ),
+    PROJECT_UN_FINISH_CAN_NOT_DELETE_USER(556,"当前用户有未完成的项目,无法删除当前用户" );
 
     private Integer code;
     private String msg;

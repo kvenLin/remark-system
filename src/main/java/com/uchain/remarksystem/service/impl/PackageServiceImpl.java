@@ -6,14 +6,13 @@ import com.uchain.remarksystem.dao.DataMapper;
 import com.uchain.remarksystem.dao.PackageMapper;
 import com.uchain.remarksystem.enums.CodeMsg;
 import com.uchain.remarksystem.exception.GlobalException;
-import com.uchain.remarksystem.model.Data;
+import com.uchain.remarksystem.model.*;
 import com.uchain.remarksystem.model.Package;
-import com.uchain.remarksystem.model.Project;
-import com.uchain.remarksystem.model.User;
 import com.uchain.remarksystem.redis.RedisService;
 import com.uchain.remarksystem.redis.RowStatusKey;
 import com.uchain.remarksystem.result.Result;
 import com.uchain.remarksystem.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Slf4j
 public class PackageServiceImpl implements PackageService {
 
     @Autowired
@@ -38,6 +38,8 @@ public class PackageServiceImpl implements PackageService {
     private UserProjectService userProjectService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private AnswerService answerService;
 
 
     @Override
@@ -180,8 +182,18 @@ public class PackageServiceImpl implements PackageService {
 
     @Override
     public Result commitToCheck(Long packageId) {
+        Package aPackage = selectById(packageId);
+        if (aPackage==null){
+            return Result.error(CodeMsg.PACKAGE_NOT_EXIST);
+        }
         //检测当前数据包是否标注完成
         if (dataService.checkPackageDataFinish(packageId)) {
+            //判断当前的数据包中是否有错误的回答,若有则无标识没有进行修改则不能进行提交至验收员
+            List<Answer> answers = answerService.selectByPackageAndStatus(packageId,2);
+            log.info("answers:{}",answers.toString());
+            if (answers.size()!=0){
+                return Result.error(CodeMsg.HAS_WRONG_ANSWER_TO_CHANGE);
+            }
             return changeStatus(packageId,1);
         }
         return Result.error(CodeMsg.DATA_ANSWER_NOT_FINISH);
@@ -196,6 +208,11 @@ public class PackageServiceImpl implements PackageService {
         //检测当前数据包是否是1审核状态
         if (aPackage.getStatus()!=1&&aPackage.getStatus()!=4){
             return Result.error(CodeMsg.PACKAGE_STATUS_ERROR);
+        }
+        //判断当前的数据包中是否有错误的回答,若有则不能提交至验收员
+        List<Answer> answers = answerService.selectByPackageAndStatus(packageId, 2);
+        if (answers.size()!=0){
+            return Result.error(CodeMsg.HAS_WRONG_ANSWER_TO_CHANGE);
         }
         return changeStatus(packageId,2);
     }
@@ -212,10 +229,16 @@ public class PackageServiceImpl implements PackageService {
         if (aPackage.getStatus()!=2){
             return Result.error(CodeMsg.PACKAGE_STATUS_ERROR);
         }
+        //判断当前的数据包中是否有错误的回答,若有则不能验收通过
+        List<Answer> answers = answerService.selectByPackageAndStatus(packageId, 2);
+        if (answers.size()!=0){
+            return Result.error(CodeMsg.HAS_WRONG_ANSWER_TO_CHANGE);
+        }
         Result result = changeStatus(packageId, 5);
         if (result.getCode()!=0){
             return result;
         }
+
         //判断是否还有未完成的数据,若无则更改项目状态为结束
         if (dataService.checkProjectDataFinish(project.getId())){
             project.setStatus(2);

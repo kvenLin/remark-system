@@ -49,6 +49,11 @@ public class UserProjectServiceImpl implements UserProjectService {
     }
 
     @Override
+    public void deleteByUser(Long userId) {
+        userProjectMapper.deleteByUserId(userId);
+    }
+
+    @Override
     public UserProject select(Long userId, Long projectId) {
         return userProjectMapper.selectByUserIdAndProjectId(userId, projectId);
     }
@@ -100,6 +105,11 @@ public class UserProjectServiceImpl implements UserProjectService {
             }
         }
         return Result.success();
+    }
+
+    @Override
+    public List<Project> selectUnfinishedProjectByUserId(Long userId) {
+        return userProjectMapper.selectUnfinishedProjectByUserId(userId);
     }
 
 }

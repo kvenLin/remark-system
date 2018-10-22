@@ -22,7 +22,7 @@ public class RedisService {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
-            jedis.flushAll();
+            jedis.flushDB();
         }finally {
             returnToPool(jedis);
         }

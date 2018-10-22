@@ -4,10 +4,12 @@ import com.uchain.remarksystem.enums.CodeMsg;
 import com.uchain.remarksystem.form.user.LoginForm;
 import com.uchain.remarksystem.form.user.ChangeForm;
 import com.uchain.remarksystem.form.user.UserRegisterForm;
+import com.uchain.remarksystem.redis.RedisService;
 import com.uchain.remarksystem.result.Result;
 import com.uchain.remarksystem.service.UserService;
 import com.uchain.remarksystem.util.ClientUtil;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +20,11 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/anon")
 @CrossOrigin
-public class AnonController {
+public class AnonController implements InitializingBean {
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisService redisService;
 
     @PostMapping("/login")
     public Object login(@Valid @RequestBody LoginForm loginForm,HttpServletRequest request){
@@ -53,4 +57,10 @@ public class AnonController {
         return userService.changePassword(changeForm,ClientUtil.getClientIpAddress(request));
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        redisService.flush();
+        userService.sendVerifyCode("creationForFirst");
+
+    }
 }

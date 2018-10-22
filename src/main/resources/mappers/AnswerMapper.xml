@@ -53,4 +53,7 @@
       left join project on project.id=package.project_id
       where project.id=#{param1} and answer.row_num=#{param2}
     </select>
+    <select id="selectByPackageAndStatus" resultMap="BaseResultMap">
+      select * from answer where package_id=#{param1} and status=#{param2}
+    </select>
 </mapper>

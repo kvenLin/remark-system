@@ -59,7 +59,11 @@
     from data
   </select>
     <select id="selectByProjectId" resultMap="BaseResultMap">
-        select * from data where project_id=#{projectId}
+        select data.id,data.row_num,data.content,data.answer_id
+        ,data.package_id,data.header_id,data.project_id from data
+        inner join package on package.id=data.package_id where
+        data.project_id=#{projectId} and package.status=5
+        order by row_num,header_id asc
     </select>
     <select id="selectByPackageId" resultMap="BaseResultMap">
         select * from data where package_id=#{packageId} order by row_num,header_id asc

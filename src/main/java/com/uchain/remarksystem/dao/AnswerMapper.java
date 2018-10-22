@@ -19,4 +19,6 @@ public interface AnswerMapper {
     Answer selectByPackageAndRowNum(Long packageId, Integer rowNum);
 
     Answer selectByProjectAndRowNum(Long projectId, Integer rowNum);
+
+    List<Answer> selectByPackageAndStatus(Long packageId, Integer status);
 }

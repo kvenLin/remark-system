@@ -86,7 +86,7 @@
     </where>
   </select>
   <select id="selectUnFinishPackage" resultMap="BaseResultMap">
-    select * from package where status!=5 and project_id=#{param2} and user_id=#{param1}
+    select * from package where status=0 and project_id=#{param2} and user_id=#{param1}
   </select>
     <select id="selectByAnswerId" resultMap="BaseResultMap">
       select package.id,package.project_id, package.user_id, package.status, package.start_time, package.update_time

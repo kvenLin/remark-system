@@ -543,24 +543,22 @@ public class FormServiceImpl implements FormService {
 
             //判断项目是否带有文本
             if (project.getHasText()==0){//不带文本的形式
-
-                //遍历数据包
-                for (Package aPackage : packages) {
-                    Integer k = 1;
-                    List<Data> dataList = dataService.allPackageData(aPackage.getId());
-                    //获取第一个元素的行数
+                //记录行数
+                Integer k = 1;
+                List<Data> dataList = dataService.allProjectData(projectId);
+                if (dataList.size()>0){
                     Integer tag = dataList.get(0).getRowNum();
                     Integer headerNum = 0;
-                    //TODO,遍历单元格数据创建每一行的数据
+                    //遍历单元格数据创建每一行的数据
                     HSSFRow row1 = sheet.createRow(k);
                     for (int i = 0; i < dataList.size(); i++) {
                         Data data = dataList.get(i);
                         //获取当前行数
                         Integer rowNum = data.getRowNum();
                         //判断是否是遍历到了下一行的数据
-                        if (tag!=rowNum){
+                        if (tag != rowNum) {
                             //添加上一行的最后的标注信息和描述信息
-                            Answer answer = answerService.selectByPackageAndRowNum(aPackage.getId(),tag);
+                            Answer answer = answerService.selectByProjectAndRowNum(data.getProjectId(), tag);
                             Choice choice = selectByChoiceId(answer.getChoiceId());
                             row1.createCell(headerNum++).setCellValue(choice.getContent());
                             //进行换行操作
@@ -575,9 +573,9 @@ public class FormServiceImpl implements FormService {
                         //添加原始信息
                         row1.createCell(headerNum++).setCellValue(data.getContent());
                         //遍历到最后一行的最后一个元素
-                        if (i+1==dataList.size()){
+                        if (i + 1 == dataList.size()) {
                             //添加上一行的最后的标注信息和描述信息
-                            Answer answer = answerService.selectByPackageAndRowNum(aPackage.getId(), data.getRowNum());
+                            Answer answer = answerService.selectByPackageAndRowNum(data.getPackageId(), data.getRowNum());
                             Choice choice = selectByChoiceId(answer.getChoiceId());
                             row1.createCell(headerNum++).setCellValue(choice.getContent());
                         }
@@ -587,8 +585,8 @@ public class FormServiceImpl implements FormService {
                 //记录行数
                 Integer k = 1;
                 //带文本的形式进行
-                for (Package aPackage : packages) {
-                    List<Data> dataList = dataService.allPackageData(aPackage.getId());
+                List<Data> dataList = dataService.allProjectData(projectId);
+                if (dataList.size()>0){
                     //获取第一个元素的行数
                     Integer tag = dataList.get(0).getRowNum();
                     Integer headerNum = 0;
@@ -600,7 +598,7 @@ public class FormServiceImpl implements FormService {
                         //判断是否是遍历到了下一行的数据
                         if (tag!=rowNum){
                             //添加上一行的最后的answerData
-                            List<AnswerData> answerDataList = answerDataService.selectByProjectRowNum(aPackage.getProjectId(), tag);
+                            List<AnswerData> answerDataList = answerDataService.selectByProjectRowNum(projectId, tag);
                             for (AnswerData answerData : answerDataList) {
                                 row1.createCell(headerNum++).setCellValue(answerData.getContent());
                             }
@@ -669,7 +667,7 @@ public class FormServiceImpl implements FormService {
         }
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.addHeader("Content-Disposition", "attachment; filename="
-                + new String(fileName.getBytes("gb2312"), "iso8859-1") + ".xlsx");
+                + new String(fileName.getBytes("gb2312"), "iso8859-1") + ".xls");
         OutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();

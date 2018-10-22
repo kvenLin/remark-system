@@ -10,6 +10,8 @@ public interface UserProjectMapper {
 
     void deleteByProject(Long id);
 
+    void deleteByUserId(Long userId);
+
     int insert(UserProject record);
 
     UserProject selectByPrimaryKey(Long id);
@@ -21,4 +23,6 @@ public interface UserProjectMapper {
     UserProject selectByUserIdAndProjectId(Long userId, Long projectId);
 
     List<Project> selectProjectByUserId(Long userId);
+
+    List<Project> selectUnfinishedProjectByUserId(Long userId);
 }
