@@ -22,20 +22,20 @@
 ## 界面展示
 * 登录
 
-![登录界面](https://github.com/kvenLin/remark-system/blob/master/src/main/resources/images/选区_003.png)
+![登录界面](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_003.png)
 
 * 用户管理
 
-![用户管理](https://github.com/kvenLin/remark-system/blob/master/src/main/resources/images/选区004.png)
+![用户管理](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_004.png)
 
 * 项目管理
 
-![项目管理](https://github.com/kvenLin/remark-system/blob/master/src/main/resources/images/选区005.png)
+![项目管理](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_005.png)
 
 * 数据包管理
 
-![数据包管理](https://github.com/kvenLin/remark-system/blob/master/src/main/resources/images/选区006.png)
+![数据包管理](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_006.png)
 
 * 用户查看参与的项目
 
-![查看参与项目](https://github.com/kvenLin/remark-system/blob/master/src/main/resources/images/选区007.png)
+![查看参与项目](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_007.png)
