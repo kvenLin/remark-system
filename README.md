@@ -55,4 +55,4 @@
 但是相对是比较合理的解决方案.
 同时为了每个应用服务都能被访问到,使用nginx进行ip_hash路由.
 
-[参考图](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_034.png)
+![参考图](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_034.png)
