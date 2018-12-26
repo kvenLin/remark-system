@@ -41,7 +41,7 @@ public class ProjectController {
 
     @GetMapping("/delete")
     @RequireRole(role = RoleEnum.ADMIN)
-    @ApiOperation("删除项目,只有项目状态是 0:未启动,2:已完成 才能删除; 1:进行中")
+    @ApiOperation("删除项目 0:未启动, 2:已完成, 1:进行中")
     public Object delete(Long id){
         if (id==null){
             return Result.error(CodeMsg.PARAM_IS_NULL);
@@ -50,11 +50,9 @@ public class ProjectController {
         if (project==null){
             return Result.success();
         }
-        if (project.getStatus()==0||project.getStatus()==2){
-            projectService.delete(id);
-            return Result.success();
-        }
-        return Result.error(CodeMsg.PROJECT_CAN_NOT_DELETE);
+        projectService.delete(id);
+        return Result.success();
+//        return Result.error(CodeMsg.PROJECT_CAN_NOT_DELETE);
     }
 
     @GetMapping("/all")

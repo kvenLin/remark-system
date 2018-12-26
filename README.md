@@ -19,6 +19,7 @@
     * 根据需要修改jwt.secret和jwt.expiration
 * 启动项目
 * 打开前端界面: resources/build/index.html
+* [前端界面源码](https://github.com/aSmallAlan/labelSystem.git)
 ## 界面展示
 * 登录
 
@@ -56,3 +57,9 @@
 同时为了每个应用服务都能被访问到,使用nginx进行ip_hash路由.
 
 ![参考图](https://raw.githubusercontent.com/kvenLin/remark-system/master/src/main/resources/images/选区_034.png)
+
+## 修改内容
+* 对数据库字段修改: 
+    * content字段由varchar类型修改为longtext
+    * 同时将content字段字符集设为utf8mb4;排序规则设为utf8mb4_general_ci
+* [参考博客:utf8mb4和utf8的区别](https://blog.csdn.net/yan791124465/article/details/70738939)
