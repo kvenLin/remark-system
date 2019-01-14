@@ -19,7 +19,7 @@
   </delete>
     <delete id="deleteByProject" parameterType="java.lang.Long">
       delete from answer_data
-      where id = #{id}
+      where project_id = #{id}
     </delete>
     <insert id="insert" keyProperty="id" parameterType="com.uchain.remarksystem.model.AnswerData" useGeneratedKeys="true">
     insert into answer_data (id,row_num, content, package_id,

@@ -1,5 +1,6 @@
 package com.uchain.remarksystem.service.impl;
 
+import com.uchain.remarksystem.DTO.DataGroup;
 import com.uchain.remarksystem.dao.AnswerHeaderMapper;
 import com.uchain.remarksystem.dao.ChoiceMapper;
 import com.uchain.remarksystem.dao.HeaderMapper;
@@ -17,6 +18,7 @@ import com.uchain.remarksystem.redis.RedisService;
 import com.uchain.remarksystem.result.Result;
 import com.uchain.remarksystem.service.*;
 import com.uchain.remarksystem.util.ClientUtil;
+import com.uchain.remarksystem.util.ExcelUtil;
 import com.uchain.remarksystem.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
@@ -25,6 +27,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,9 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
@@ -55,11 +61,13 @@ public class FormServiceImpl implements FormService {
     @Autowired
     private AnswerService answerService;
     @Autowired
-    private PackageService packageService;
+    private ExcelService excelService;
     @Autowired
     private RedisService redisService;
     @Autowired
     private AnswerDataService answerDataService;
+    @Value("${split.num}")
+    private Integer splitNum;
 
     @Override
     public boolean insertHeader(Header header) {
@@ -498,6 +506,7 @@ public class FormServiceImpl implements FormService {
 
     @Override
     public void download(Long projectId, HttpServletResponse response) throws IOException {
+        long startTime = System.currentTimeMillis();
         Project project = projectService.selectById(projectId);
         if (project==null){
             throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
@@ -510,37 +519,10 @@ public class FormServiceImpl implements FormService {
         HSSFSheet sheet = workbook.createSheet(project.getName());
         String fileName = project.getName();//设置导出的文件的名字
 
-        //得到表头数据
-        List<Header> headers = selectHeaderByProjectId(projectId);
-        Integer headerLastColumn = headers.size();
-        //在excel中添加表头
-        HSSFRow row = sheet.createRow(0);
-        for (int i = 0; i < headers.size(); i++) {
-            HSSFCell cell = row.createCell(i);
-            HSSFRichTextString text = new HSSFRichTextString(headers.get(i).getName());
-            cell.setCellValue(text);
-        }
 
-        if (project.getHasText()==1){
-            //添加回答的表头
-            List<Header> answerHeaders = selectAnswerHeaderByProjectId(projectId);
-            for (int i = 0; i < answerHeaders.size(); i++) {
-                HSSFCell cell = row.createCell(headerLastColumn);
-                cell.setCellValue(answerHeaders.get(i).getName());
-                headerLastColumn++;
-            }
-        }else {
-            //添加选择标注栏
-            HSSFCell cell = row.createCell(headerLastColumn);
-            HSSFRichTextString text = new HSSFRichTextString("选择内容");
-            cell.setCellValue(text);
-        }
-
+        excelService.createHeader(sheet, project);
         //项目还在进行中
         if (project.getStatus()==1){
-            //得到所有完成的数据包
-            List<Package> packages = packageService.selectFinishByProject(projectId);
-
             //判断项目是否带有文本
             if (project.getHasText()==0){//不带文本的形式
                 //记录行数
@@ -628,41 +610,35 @@ public class FormServiceImpl implements FormService {
         }
         //项目已经全部完成
         if (project.getStatus()==2){
-            //选择类项目
-            if (project.getHasText()!=1){
-                //创建每一行的数据
-                for (Integer i = 0; i < project.getDataNum(); i++) {
-                    HSSFRow row1 = sheet.createRow(i+1);
-                    //获取第i+1行的数据
-                    List<Data> dataList = dataService.selectByProjectRowNum(projectId,i+1);
+            //拆分数据
+            List<DataGroup> groups = ExcelUtil.getDataGroup(project.getDataNum(), splitNum);
+            //使用线程池进行线程管理
+            ExecutorService es = Executors.newCachedThreadPool();
+            //使用计数栅栏
+            CountDownLatch doneSignal = new CountDownLatch(groups.size());
 
-                    //遍历将数据放入表中
-                    for (int j = 0; j < dataList.size(); j++) {
-                        row1.createCell(j).setCellValue(dataList.get(j).getContent());
-                    }
-                    //添加answer的choice
-                    Answer answer = answerService.selectByProjectAndRowNum(projectId,i+1);
-                    if (answer==null){
-                        continue;
-                    }
-                    Choice choice = selectByChoiceId(answer.getChoiceId());
-                    row1.createCell(dataList.size()).setCellValue(choice.getContent());
+            try {
+                for (int i = 0; i < groups.size(); i++) {
+                    int a = i;
+                    es.submit(new Thread(){
+                        @Override
+                        public void run() {
+                            excelService.createDataCell(
+                                    groups.get(a).getStartNum(),
+                                    groups.get(a).getEndNum(),
+                                    sheet, project);
+                            doneSignal.countDown();
+                        }
+                    });
                 }
-            }else {//带有文本的类型的项目
-                for (Integer i = 0; i < project.getDataNum(); i++) {
-                    HSSFRow row1 = sheet.createRow(i+1);
-                    //获取第i+1行的数据
-                    List<Data> dataList = dataService.selectByProjectRowNum(projectId,i+1);
-                    //遍历将数据放入表中
-                    int lastColumn = 0;
-                    for (lastColumn = 0; lastColumn < dataList.size(); lastColumn++) {
-                        row1.createCell(lastColumn).setCellValue(dataList.get(lastColumn).getContent());
-                    }
-                    List<AnswerData> answerDataList = answerDataService.selectByProjectRowNum(projectId, i + 1);
-                    for (int k = 0; k < answerDataList.size(); k++) {
-                        row1.createCell(lastColumn++).setCellValue(answerDataList.get(k).getContent());
-                    }
-                }
+                /**
+                 * 使用CountDownLatch的await方法，等待所有线程完成sheet操作
+                 */
+                doneSignal.await();
+                es.shutdown();
+                log.info("Excel completed......");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
@@ -673,6 +649,9 @@ public class FormServiceImpl implements FormService {
         workbook.close();
         outputStream.flush();
         outputStream.close();
+        long endTime = System.currentTimeMillis();
+        log.info("整个制表时间为: " + (endTime / 1000 - startTime / 1000) + " s");
+
     }
 
     @Override
