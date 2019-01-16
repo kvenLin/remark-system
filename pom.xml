@@ -119,6 +119,11 @@
             <artifactId>poi-ooxml</artifactId>
             <version>3.13</version>
         </dependency>
+        <!--优雅的停止项目-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
