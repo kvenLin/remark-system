@@ -21,7 +21,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/userProject")
+@RequestMapping("/remark/userProject")
 @CrossOrigin
 public class UserProjectController {
 

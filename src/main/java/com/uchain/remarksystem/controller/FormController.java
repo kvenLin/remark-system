@@ -24,7 +24,7 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/form")
+@RequestMapping("/remark/form")
 public class FormController {
 
     @Autowired

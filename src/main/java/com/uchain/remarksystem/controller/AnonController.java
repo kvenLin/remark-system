@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/anon")
+@RequestMapping("/remark/anon")
 @CrossOrigin
 public class AnonController implements InitializingBean {
     @Autowired

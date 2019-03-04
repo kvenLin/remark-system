@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/package")
+@RequestMapping("/remark/package")
 @CrossOrigin
 public class PackageController {
 

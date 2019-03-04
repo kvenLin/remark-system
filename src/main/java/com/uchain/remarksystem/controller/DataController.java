@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@RequestMapping("/data")
+@RequestMapping("/remark/data")
 @RestController
 @CrossOrigin
 @Slf4j

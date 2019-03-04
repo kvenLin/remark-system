@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@RequestMapping("/user")
+@RequestMapping("/remark/user")
 @CrossOrigin
 @RestController
 public class UserController {

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RequestMapping("/answerData")
+@RequestMapping("/remark/answerData")
 @RestController
 @CrossOrigin
 @Slf4j
